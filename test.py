@@ -165,7 +165,7 @@ def draw_square(radius, x_center, y_center):
     
 
 
-def draw_circle(x):
+def draw_circle(x_center=0,y_center=400,x=15):
 
     global previous_time
     start_time = time.time()
@@ -207,52 +207,61 @@ def draw_circle(x):
     global state
 
     # Create a new circle at the top if no circles or if the last circle has passed midpoint
-    if not obstacle or all(circle[1] <= 0 for circle in obstacle):
-        x_center = random.choice(range(-320, 320, 50))
-        y_center = 400
-        radius = x-2
-        obstacle.append([x_center, y_center, radius])
+    # if not obstacle or all(circle[1] <= 0 for circle in obstacle):
+    #     x_center = random.choice(range(-320, 320, 50))
+    #     y_center = 400
+    #     radius = x-2
+    #     obstacle.append([x_center, y_center, radius])
+    radius = x
+    # for circle in obstacle[:]:  # Iterate over a copy to allow safe removal
+    #     x_center, y_center, radius = circle
+    #     y_center -= max((score//50),2)  # Move the circle downward
+    #     circle[1] = y_center  # Update the y-coordinate
 
-    for circle in obstacle[:]:  # Iterate over a copy to allow safe removal
-        x_center, y_center, radius = circle
-        y_center -= max((score//50),2)  # Move the circle downward
-        circle[1] = y_center  # Update the y-coordinate
-
-        # Remove the circle if it has reached the bottom of the screen
-        if y_center <= -512:
-            obstacle.remove(circle)
-            lives -= 1
-            if lives <= 0:
-                state = False
-                draw_controls()
-                show_game_over_screen()
-            continue
+    #     # Remove the circle if it has reached the bottom of the screen
+    #     if y_center <= -512:
+    #         obstacle.remove(circle)
+    #         lives -= 1
+    #         if lives <= 0:
+    #             state = False
+    #             draw_controls()
+    #             show_game_over_screen()
+    #         continue
         # for laser_line in laser:
         #     if line_circle_collision([laser_line[0], laser_line[1], laser_line[0], laser_line[1] + 10], [x_center, y_center, radius]):
         #         score += radius
         #         obstacle.remove(circle)
         #         laser.remove(laser_line)
         # Draw the circle using midpoint algorithm
-        points = midpoint_circle(radius, x_center, y_center)
-        for point in points:
-            draw_points(point[0], point[1],3)
-        draw_square(radius, x_center, y_center)
+    points = midpoint_circle(radius-2, x_center, y_center)
+    for point in points:
+        draw_points(point[0], point[1],3)
+    draw_square(radius, x_center, y_center)
 
-        elapsed_time = time.time() - start_time
-        remaining_time = frame_time - elapsed_time
-        if remaining_time > 0:
-            time.sleep(remaining_time)
-    pass
+    elapsed_time = time.time() - start_time
+    remaining_time = frame_time - elapsed_time
+    if remaining_time > 0:
+        time.sleep(remaining_time)
 
-def box(x):
-    draw_circle(x)
+
+def box(x_center=0,y_center=400,x=15):
+    draw_circle(x_center,y_center,x)
 
 
 class Tetromino():
     def __init__(self):
-        pass
+        self.tetromino = [[0,400],[0,366],[0,332],[0,298]]
+
+    def draw(self):
+        for i in self.tetromino:
+            box(i[0],i[1])
+
+    def descend(self):
+        for i in self.tetromino:
+            i[1]-=5
 
 
+tetro = Tetromino()
 
 def mouseListener(button, con, x, y):	#/#/x, y is the x-y of the screen (2D)
     global state, paused, obstacle, laser, score, lives, misses
@@ -344,7 +353,8 @@ def showScreen():
         else: 
             # draw_ship()
             # draw_circle()
-            box(15)
+            tetro.draw()
+            tetro.descend()
             # draw_laser()
         draw_controls()
     else:

@@ -140,12 +140,24 @@ def draw_template():
     Draws the rectangular frame (borders) of the Tetris game screen.
     """
     # Vertical borders
-    draw_bricks(-369, -512, 512, False)  # Left border
-    draw_bricks(369, -512, 512)   # Right border
+    draw_bricks(-369, -480, 512, False)  # Left border
+    draw_bricks(359, -480, 512)   # Right border
 
-    # Horizontal borders
-    draw_bricks(-369, -512, -497)  # Bottom border
-    draw_bricks(-369, 497, 512)    # Top border
+    # # Horizontal borders
+    # # draw_bricks(329, 497, 512)    # Top border
+    # # draw_bricks(-369, 497, 512)    # Top border
+    draw_bricks(-450, -512, -497)  # Bottom border
+    draw_bricks(-90, -512, -497)  # Bottom border
+    draw_bricks(-180, -512, -497)  # Bottom border
+    draw_bricks(-270, -512, -497)  # Bottom border
+    draw_bricks(-360, -512, -497)  # Bottom border
+    
+    draw_bricks(0, -512, -497)  # Bottom border
+    draw_bricks(90, -512, -497)  # Bottom border
+    draw_bricks(180, -512, -497)  # Bottom border
+    draw_bricks(270, -512, -497)  # Bottom border
+    draw_bricks(360, -512, -497)  # Bottom border
+    
 
 
 

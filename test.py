@@ -83,16 +83,83 @@ def draw_lines(x,y):
         draw_points(i[0], i[1],3)
 
 
+def draw_random_texture(x, y):
+        """
+        Draws random dots inside a 15x15 brick.
+        """
+        for _ in range(random.randint(5, 10)):  # Random number of dots
+            dot_x = random.randint(x - 14, x + 14)  # Random x within the brick
+            dot_y = random.randint(y, y + 14)      # Random y within the brick
+            draw_points(dot_x, dot_y)
+
+def draw_bricks(x_start, y_start, y_end, direction=True, row_offset=15):
+    """
+    Draws two rows of bricks where the second row is offset to create a staggered pattern.
+    Each brick is 15x15 in size.
+    """
+    if direction:
+        for y in range(y_start, y_end, 30):  # Increment by 30 to leave space for two rows
+        # First row of bricks
+            for x in range(x_start, x_start + 90, 30):  # Adjust x to control brick count
+                draw_lines((x - 15, y), (x + 15, y))      # Top horizontal line
+                draw_lines((x - 15, y + 15), (x + 15, y + 15))  # Bottom horizontal line
+                draw_lines((x - 15, y), (x - 15, y + 15))  # Left vertical line
+                draw_lines((x + 15, y), (x + 15, y + 15))  # Right vertical line
+                draw_random_texture(x, y)  # Add random texture inside the brick
+
+            # Second row of bricks with an offset
+            for x in range(x_start + row_offset, x_start + 90 + row_offset, 30):
+                draw_lines((x - 15, y + 15), (x + 15, y + 15))  # Top horizontal line
+                draw_lines((x - 15, y + 30), (x + 15, y + 30))  # Bottom horizontal line
+                draw_lines((x - 15, y + 15), (x - 15, y + 30))  # Left vertical line
+                draw_lines((x + 15, y + 15), (x + 15, y + 30))  # Right vertical line
+                draw_random_texture(x, y + 15)  # Add random texture inside the brick
+    
+    else:
+       for y in range(y_start, y_end, 30):  # Increment by 30 to leave space for two rows
+    # First row of bricks
+            for x in range(x_start, x_start - 90, -30):  # Decrement x to extend bricks to the left
+                draw_lines((x + 15, y), (x - 15, y))      # Top horizontal line
+                draw_lines((x + 15, y + 15), (x - 15, y + 15))  # Bottom horizontal line
+                draw_lines((x + 15, y), (x + 15, y + 15))  # Left vertical line
+                draw_lines((x - 15, y), (x - 15, y + 15))  # Right vertical line
+                draw_random_texture(x, y)  # Add random texture inside the brick
+
+            # Second row of bricks with an offset
+            for x in range(x_start + row_offset, x_start - 90 - row_offset, -30):
+                draw_lines((x - 15, y + 15), (x + 15, y + 15))  # Top horizontal line
+                draw_lines((x - 15, y + 30), (x + 15, y + 30))  # Bottom horizontal line
+                draw_lines((x - 15, y + 15), (x - 15, y + 30))  # Left vertical line
+                draw_lines((x + 15, y + 15), (x + 15, y + 30))  # Right vertical line
+                draw_random_texture(x, y + 15)  # Add random texture inside the brick
+
+
+
+def draw_template():
+    """
+    Draws the rectangular frame (borders) of the Tetris game screen.
+    """
+    # Vertical borders
+    draw_bricks(-369, -512, 512, False)  # Left border
+    draw_bricks(369, -512, 512)   # Right border
+
+    # Horizontal borders
+    draw_bricks(-369, -512, -497)  # Bottom border
+    draw_bricks(-369, 497, 512)    # Top border
 
 
 
 def iterate():
+    """
+    Sets up the viewport and projection for rendering the game screen.
+    """
     glViewport(0, 0, 768, 1024)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    glOrtho(-384, 384, -512, 512, 0, 1)
-    glMatrixMode (GL_MODELVIEW)
+    glOrtho(-384, 384, -512, 512, -1, 1)  # Adjusted glOrtho as per frame needs
+    glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
+
 
 
 
@@ -279,7 +346,7 @@ tetro = Tetromino()
 
 class Tetris():
     def __init__(self):
-        self.matrix = 
+        self.matrix = 0
 
 
 def mouseListener(button, con, x, y):	#/#/x, y is the x-y of the screen (2D)
@@ -348,6 +415,7 @@ def showScreen():
     #call the draw methods here
     global state
     global paused
+    
     if state:
         if paused:
             # Show "Paused" overlay when the game is paused
@@ -370,7 +438,7 @@ def showScreen():
             glMatrixMode(GL_MODELVIEW)
             glPopMatrix()
         else: 
-
+            draw_template()
             tetro.draw()
             tetro.descend()
 

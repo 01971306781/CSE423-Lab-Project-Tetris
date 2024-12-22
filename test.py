@@ -4,6 +4,7 @@ from OpenGL.GLU import *
 import random
 import math
 import time
+import numpy
 x1 =-15
 x2 = 15
 y1 = -475
@@ -250,7 +251,9 @@ def box(x_center=0,y_center=400,x=15):
 
 class Tetromino():
     def __init__(self):
-        self.tetromino = [[0,400],[0,366],[0,332],[0,298]]
+
+        # self.tetromino = random.choice([[[0,400],[0,366],[0,332],[0,298]],[[0,400],[0,366],[0,332],[34,332]],[[-34,332],[0,366],[0,332],[34,332]],[[-17,366],[17,366],[-17,332],[17,332]]])
+        self.tetromino = [[-34,332],[0,366],[0,332],[34,332]]
 
     def draw(self):
         for i in self.tetromino:
@@ -260,8 +263,24 @@ class Tetromino():
         for i in self.tetromino:
             i[1]-=5
 
+    def translate(key):
+        if key.lower() == 'a':
+            pass
+        else:
+            pass
+    
+    def rotate():
+        pass
+
 
 tetro = Tetromino()
+
+
+
+class Tetris():
+    def __init__(self):
+        self.matrix = 
+
 
 def mouseListener(button, con, x, y):	#/#/x, y is the x-y of the screen (2D)
     global state, paused, obstacle, laser, score, lives, misses
@@ -351,11 +370,10 @@ def showScreen():
             glMatrixMode(GL_MODELVIEW)
             glPopMatrix()
         else: 
-            # draw_ship()
-            # draw_circle()
+
             tetro.draw()
             tetro.descend()
-            # draw_laser()
+
         draw_controls()
     else:
         draw_controls()

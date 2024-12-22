@@ -1,10 +1,8 @@
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
-import random
-import math
 import time
-import numpy
+import numpy as np
 x1 =-15
 x2 = 15
 y1 = -475
@@ -85,12 +83,12 @@ def draw_lines(x,y):
 
 def draw_random_texture(x, y):
         """
-        Draws random dots inside a 15x15 brick.
+        Draws random dots inside a 15x15 brick using NumPy for better performance.
         """
-        for _ in range(random.randint(5, 10)):  # Random number of dots
-            dot_x = random.randint(x - 14, x + 14)  # Random x within the brick
-            dot_y = random.randint(y, y + 14)      # Random y within the brick
-            draw_points(dot_x, dot_y)
+        num_dots = np.random.randint(5, 11)  # Random number of dots between 5 and 10
+        dot_offsets = np.random.randint([-14, 0], [15, 15], (num_dots, 2))  # Generate offsets
+        for offset in dot_offsets:
+            draw_points(x + offset[0], y + offset[1])
 
 def draw_bricks(x_start, y_start, y_end, direction=True, row_offset=15):
     """
@@ -157,6 +155,30 @@ def draw_template():
     draw_bricks(180, -512, -497)  # Bottom border
     draw_bricks(270, -512, -497)  # Bottom border
     draw_bricks(360, -512, -497)  # Bottom border
+
+
+    draw_bricks(-450, 497, 512)  # Bottom border
+    draw_bricks(-90,  497, 512)  # Bottom border
+    draw_bricks(-180,  497, 512)  # Bottom border
+    draw_bricks(-270,  497, 512)  # Bottom border
+    draw_bricks(-360,  497, 512)  # Bottom border
+    
+    draw_bricks(0,  497, 512)  # Bottom border
+    draw_bricks(90,  497, 512)  # Bottom border
+    draw_bricks(180,  497, 512)  # Bottom border
+    draw_bricks(270,  497, 512)  # Bottom border
+    draw_bricks(360,  497, 512)  # Bottom border
+
+
+    # draw_bricks(0, 327,  361)  # Bottom border
+    draw_bricks(90, 331,  361)  # Bottom border
+    draw_bricks(180, 331,  361)  # Bottom border
+    draw_bricks(270, 331,  361)  # Bottom border
+
+    draw_bricks(-360, 331,  361)  # Bottom border
+    draw_bricks(-180, 331,  361)  # Bottom border
+    draw_bricks(-270, 331,  361)  # Bottom border    
+
     
 
 
@@ -332,7 +354,7 @@ class Tetromino():
     def __init__(self):
 
         # self.tetromino = random.choice([[[0,400],[0,366],[0,332],[0,298]],[[0,400],[0,366],[0,332],[34,332]],[[-34,332],[0,366],[0,332],[34,332]],[[-17,366],[17,366],[-17,332],[17,332]]])
-        self.tetromino = [[-34,332],[0,366],[0,332],[34,332]]
+        self.tetromino = [[0,400],[0,368],[0,336],[0,304]]
 
     def draw(self):
         for i in self.tetromino:
@@ -356,9 +378,22 @@ tetro = Tetromino()
 
 
 
-class Tetris():
+class Tetris():                       
     def __init__(self):
-        self.matrix = 0
+        self.matrix = np.full((24,21),True)  
+        self.horizon = np.full(43,-465)          # 43 column
+        for i in range(21):
+            for j in range(24):
+                self.matrix[j][i] = ((-318 + (32*i)),(-465 + (32*j)))
+    def draw(self):
+        for i in self.matrix:
+            for j in i:
+                if j:
+                    continue
+                box(j[0],j[1])
+
+game = Tetris()
+
 
 
 def mouseListener(button, con, x, y):	#/#/x, y is the x-y of the screen (2D)
@@ -453,6 +488,26 @@ def showScreen():
             draw_template()
             tetro.draw()
             tetro.descend()
+            # box(x_center=-320,y_center=300,x=15)
+            # box(x_center=+324,y_center=300,x=15)
+
+            # box(x_center=-320,y_center=-465,x=15)
+            # box(x_center=+324,y_center=-465,x=15)
+            # for i in range(-318,325,32):
+            #     for j in range(-465,300,32):
+            #         box(x_center=i,y_center=j,x=15)
+
+            for i in range(-318,325,32):
+                draw_lines((i,-465),(i,300))
+            for j in range(-465,300,32):
+                draw_lines((-318,j),(325,j))
+
+            # game.draw()
+
+            # draw_lines((-320-16,-465-16),(324+16,-465-16))
+            # draw_lines((-320-16,-465-16),(-320-16,300+16))
+            # draw_lines((324+16,-465-16),(324+16,300+16))
+
 
         draw_controls()
     else:
@@ -466,7 +521,7 @@ glutInit()
 glutInitDisplayMode(GLUT_RGBA)
 glutInitWindowSize(768, 1024) #window size 768×1024
 glutInitWindowPosition(0, 0)
-wind = glutCreateWindow(b"OpenGL Coding Practice") #window name
+wind = glutCreateWindow(b"Tetris") #window name
 glutDisplayFunc(showScreen)
 glutIdleFunc(animate) 
 # glutKeyboardFunc(keyboardListener)

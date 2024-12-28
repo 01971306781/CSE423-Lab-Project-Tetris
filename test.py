@@ -356,10 +356,10 @@ class Tetromino():
     def __init__(self):
 
         self.tetromino = np.array([
-            [[2, 400], [2, 368], [2, 336], [2, 304]],
-            [[2, 400], [2, 368], [2, 336], [34, 336]],
-            [[-30, 336], [2, 368], [2, 336], [34, 336]],
-            [[-30, 368], [2, 368], [-30, 336], [2, 336]]
+            [[2, 399], [2, 367], [2, 335], [2, 303]],
+            [[2, 399], [2, 367], [2, 335], [34, 335]],
+            [[-30, 335], [2, 367], [2, 335], [34, 335]],
+            [[-30, 367], [2, 367], [-30, 335], [2, 335]]
         ])
 
         self.tetromino = self.tetromino[np.random.randint(0, self.tetromino.shape[0])]
@@ -412,7 +412,9 @@ class Tetris():
                 self.state = True
         if self.state == True:
             for i in self.tetro.tetromino:
-                self.horizon[i[0]//32] = max(i[1],self.horizon[i[0]//32])
+                if self.horizon[i[0]//32] < i[1]:
+                    self.horizon[i[0]//32] = i[1]+32
+                    print(self.horizon[i[0]//32])
                 self.matrix[i[1]//32][i[0]//32] = [i[0]-1//32,i[1]-1//32]
 
     def play(self):

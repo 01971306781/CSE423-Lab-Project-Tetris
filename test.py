@@ -353,8 +353,9 @@ def box(x_center=0,y_center=400,x=15):
 class Tetromino():
     def __init__(self):
 
-        # self.tetromino = random.choice([[[0,400],[0,366],[0,332],[0,298]],[[0,400],[0,366],[0,332],[34,332]],[[-34,332],[0,366],[0,332],[34,332]],[[-17,366],[17,366],[-17,332],[17,332]]])
-        self.tetromino = [[0,400],[0,368],[0,336],[0,304]]
+        self.tetromino = random.choice([[[2,400],[2,368],[2,336],[2,304]],[[2,400],[2,366],[2,332],[34,332]],[[-34,332],[0,366],[0,332],[34,332]],[[-17,366],[17,366],[-17,332],[17,332]]])
+        self.tetromino = [[2,400],[2,368],[2,336],[2,304]]
+        # self.tetromino = [[0,400],[0,366],[0,332],[34,332]]
 
     def draw(self):
         for i in self.tetromino:
@@ -362,7 +363,7 @@ class Tetromino():
 
     def descend(self):
         for i in self.tetromino:
-            i[1]-=5
+            i[1]-=32
 
     def translate(key):
         if key.lower() == 'a':
@@ -374,17 +375,18 @@ class Tetromino():
         pass
 
 
-tetro = Tetromino()
+
 
 
 
 class Tetris():                       
     def __init__(self):
-        self.matrix = np.full((24,21),True)  
+        self.matrix = np.full((24,21),None)  
         self.horizon = np.full(43,-465)          # 43 column
-        for i in range(21):
-            for j in range(24):
-                self.matrix[j][i] = ((-318 + (32*i)),(-465 + (32*j)))
+        self.state = True
+        # for i in range(21):
+        #     for j in range(24):
+        #         self.matrix[j][i] = ((-318 + (32*i)),(-465 + (32*j)))
     def draw(self):
         for i in self.matrix:
             for j in i:
@@ -392,7 +394,35 @@ class Tetris():
                     continue
                 box(j[0],j[1])
 
+
+    def check(self):
+        for i in self.tetro.tetromino:
+            if self.horizon[i[0]//32] >= i[1]:
+                self.state = True
+        if self.state == True:
+            for i in self.tetro.tetromino:
+                self.horizon[i[0]//32] = max(i[1],self.horizon[i[0]//32])
+
+    def play(self):
+        if self.state == True:
+            self.tetro = Tetromino()
+            self.state = False
+        
+        # for i in tetro.tetromino:
+        #     if i[1]
+        self.tetro.draw()
+        self.tetro.descend()
+        self.check()
+
+
+
+
 game = Tetris()
+
+tetro = Tetromino()
+
+# for i in tetro.tetromino:
+#     if i[1]
 
 
 
@@ -486,8 +516,7 @@ def showScreen():
             glPopMatrix()
         else: 
             draw_template()
-            tetro.draw()
-            tetro.descend()
+            game.play()
             # box(x_center=-320,y_center=300,x=15)
             # box(x_center=+324,y_center=300,x=15)
 
@@ -502,7 +531,8 @@ def showScreen():
             for j in range(-465,300,32):
                 draw_lines((-318,j),(325,j))
 
-            # game.draw()
+            # tetro.draw()
+            # tetro.descend()
 
             # draw_lines((-320-16,-465-16),(324+16,-465-16))
             # draw_lines((-320-16,-465-16),(-320-16,300+16))

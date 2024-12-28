@@ -138,8 +138,8 @@ def draw_template():
     Draws the rectangular frame (borders) of the Tetris game screen.
     """
     # Vertical borders
-    draw_bricks(-369, -480, 512, False)  # Left border
-    draw_bricks(359, -480, 512)   # Right border
+    draw_bricks(-369, -480, 301, False)  # Left border
+    draw_bricks(359, -480, 301)   # Right border
 
     # # Horizontal borders
     # # draw_bricks(329, 497, 512)    # Top border
@@ -174,10 +174,12 @@ def draw_template():
     draw_bricks(90, 331,  361)  # Bottom border
     draw_bricks(180, 331,  361)  # Bottom border
     draw_bricks(270, 331,  361)  # Bottom border
+    draw_bricks(360, 331, 361)  # Bottom border 
 
     draw_bricks(-360, 331,  361)  # Bottom border
     draw_bricks(-180, 331,  361)  # Bottom border
-    draw_bricks(-270, 331,  361)  # Bottom border    
+    draw_bricks(-270, 331,  361)  # Bottom border   
+    draw_bricks(-450, 331, 361)  # Bottom border 
 
     
 
@@ -353,9 +355,14 @@ def box(x_center=0,y_center=400,x=15):
 class Tetromino():
     def __init__(self):
 
-        self.tetromino = random.choice([[[2,400],[2,368],[2,336],[2,304]],[[2,400],[2,366],[2,332],[34,332]],[[-34,332],[0,366],[0,332],[34,332]],[[-17,366],[17,366],[-17,332],[17,332]]])
-        self.tetromino = [[2,400],[2,368],[2,336],[2,304]]
-        # self.tetromino = [[0,400],[0,366],[0,332],[34,332]]
+        self.tetromino = np.array([
+            [[2, 400], [2, 368], [2, 336], [2, 304]],
+            [[2, 400], [2, 368], [2, 336], [34, 336]],
+            [[-30, 336], [2, 368], [2, 336], [34, 336]],
+            [[-30, 368], [2, 368], [-30, 336], [2, 336]]
+        ])
+
+        self.tetromino = self.tetromino[np.random.randint(0, self.tetromino.shape[0])]
 
     def draw(self):
         for i in self.tetromino:
@@ -365,10 +372,13 @@ class Tetromino():
         for i in self.tetromino:
             i[1]-=32
 
-    def translate(key):
+    def translate(self,key):
         if key.lower() == 'a':
-            pass
+            self.tetromino = [[max((i[0]-32),-318),i[1]] for i in self.tetromino]
+        elif key.lower() == 'd':
+            self.tetromino = [[min((i[0]+32),322),i[1]] for i in self.tetromino]
         else:
+            # self.tetromino = [[min((i[0]+32),322),i[1]] for i in self.tetromino]
             pass
     
     def rotate():
@@ -390,9 +400,10 @@ class Tetris():
     def draw(self):
         for i in self.matrix:
             for j in i:
-                if j:
+                if j is None or (np.array_equal(j, np.array(None))):  
                     continue
-                box(j[0],j[1])
+                box(j[0], j[1])
+
 
 
     def check(self):
@@ -402,6 +413,7 @@ class Tetris():
         if self.state == True:
             for i in self.tetro.tetromino:
                 self.horizon[i[0]//32] = max(i[1],self.horizon[i[0]//32])
+                self.matrix[i[1]//32][i[0]//32] = [i[0]-1//32,i[1]-1//32]
 
     def play(self):
         if self.state == True:
@@ -411,8 +423,9 @@ class Tetris():
         # for i in tetro.tetromino:
         #     if i[1]
         self.tetro.draw()
-        self.tetro.descend()
         self.check()
+        self.tetro.descend()
+        self.draw()
 
 
 
@@ -462,19 +475,11 @@ def keyboardListener(key, x, y):
     # global x1
     # global x2
     # global score
-    # if key==b'a':
-    #     x1 -= 15
-    #     x2 -= 15
-    #     if x2 <= -384:
-    #         x2 = 384
-    #         x1 = x2 - 30
+    if key==b'a':
+        game.tetro.translate('a')
         
-    # if key==b'd':
-    #     x1 += 15 + (score/5)
-    #     x2 += 15 + (score/5)
-    #     if x1 >= 384:
-    #         x1 = -384
-    #         x2 = x1 + 30
+    if key==b'd':
+        game.tetro.translate('d')
     # if key==b' ':
     #     draw_laser((x1+x2)/2)
     pass
@@ -554,6 +559,6 @@ glutInitWindowPosition(0, 0)
 wind = glutCreateWindow(b"Tetris") #window name
 glutDisplayFunc(showScreen)
 glutIdleFunc(animate) 
-# glutKeyboardFunc(keyboardListener)
+glutKeyboardFunc(keyboardListener)
 glutMouseFunc(mouseListener)
 glutMainLoop() 

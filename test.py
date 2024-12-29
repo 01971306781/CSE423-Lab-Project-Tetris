@@ -445,7 +445,7 @@ class Tetris():
                 self.matrix[i[1]//32][i[0]//32] = [(i[0]-1//32),(i[1]-1//32)]
 
     def point(self):
-        global point
+        global score
         c = 0
         for i in range(len(self.matrix)):
             if None in self.matrix[i]:
@@ -459,7 +459,7 @@ class Tetris():
                 
         np.roll(self.matrix, shift=c, axis=0)
         self.horizon = [i-(c*32) for i in self.horizon]
-        point += c*10
+        score += c*10
                 
 
                 

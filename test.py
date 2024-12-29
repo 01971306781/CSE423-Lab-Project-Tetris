@@ -352,9 +352,8 @@ def box(x_center=0,y_center=400,x=15):
     draw_circle(x_center,y_center,x)
 
 
-class Tetromino():
+class Tetromino:
     def __init__(self):
-
         self.tetromino = np.array([
             [[2, 399], [2, 367], [2, 335], [2, 303]],
             [[2, 399], [2, 367], [2, 335], [34, 335]],
@@ -362,29 +361,58 @@ class Tetromino():
             [[-30, 367], [2, 367], [-30, 335], [2, 335]]
         ])
 
+        # Randomly select one tetromino shape
         self.tetromino = self.tetromino[np.random.randint(0, self.tetromino.shape[0])]
+        self.rotate_dir = 1  # Direction for rotation (1 for 90°, -1 for -90°)
 
     def draw(self):
+        """Draw the tetromino on the screen."""
         for i in self.tetromino:
-            box(i[0],i[1])
+            box(i[0], i[1])
 
     def descend(self):
+        """Move the tetromino down by one step."""
         for i in self.tetromino:
-            i[1]-=32
+            i[1] -= 32
 
-    def translate(self,key):
-        if key.lower() == 'a':
-            self.tetromino = [[max((i[0]-32),-318),i[1]] for i in self.tetromino]
-        elif key.lower() == 'd':
-            self.tetromino = [[min((i[0]+32),322),i[1]] for i in self.tetromino]
-        else:
-            # self.tetromino = [[min((i[0]+32),322),i[1]] for i in self.tetromino]
-            pass
-    
-    def rotate():
-        pass
+    def translate(self, key):
+        """Move the tetromino left or right."""
+        if key.lower() == 'a':  # Move left
+            self.tetromino = [[max((i[0] - 32), -318), i[1]] for i in self.tetromino]
+        elif key.lower() == 'd':  # Move right
+            self.tetromino = [[min((i[0] + 32), 322), i[1]] for i in self.tetromino]
 
+    def rotate(self):
+        """Rotate the tetromino 90° or -90° around its center."""
+        # Find the center of the tetromino
+        center = np.mean(self.tetromino, axis=0).astype(int)
 
+        # Rotate each block around the center
+        rotated = []
+        for x, y in self.tetromino:
+            # Translate block to origin (center)
+            translated_x = x - center[0]
+            translated_y = y - center[1]
+
+            # Apply rotation based on direction
+            if self.rotate_dir == 1:  # 90° clockwise
+                new_x = translated_y
+                new_y = -translated_x
+            else:  # -90° counterclockwise
+                new_x = -translated_y
+                new_y = translated_x
+
+            # Translate back to original position
+            final_x = new_x + center[0]
+            final_y = new_y + center[1]
+
+            rotated.append([final_x, final_y])
+
+        # Update the tetromino with the rotated positions
+        self.tetromino = np.array(rotated)
+
+        # Toggle rotation direction
+        self.rotate_dir *= -1
 
 
 
@@ -413,9 +441,9 @@ class Tetris():
         if self.state == True:
             for i in self.tetro.tetromino:
                 if self.horizon[i[0]//32] < i[1]:
-                    self.horizon[i[0]//32] = i[1]+32
+                    self.horizon[i[0]//32] = i[1]
                     print(self.horizon[i[0]//32])
-                self.matrix[i[1]//32][i[0]//32] = [i[0]-1//32,i[1]-1//32]
+                self.matrix[i[1]//32][i[0]//32] = [(i[0]-1//32),(i[1]-1//32)]
 
     def play(self):
         if self.state == True:
@@ -484,6 +512,8 @@ def keyboardListener(key, x, y):
         game.tetro.translate('d')
     # if key==b' ':
     #     draw_laser((x1+x2)/2)
+    elif key == b'f':
+        game.tetro.rotate()
     pass
 
 

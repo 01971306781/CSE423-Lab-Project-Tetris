@@ -352,8 +352,9 @@ def box(x_center=0,y_center=400,x=15):
     draw_circle(x_center,y_center,x)
 
 
-class Tetromino:
+class Tetromino():
     def __init__(self):
+
         self.tetromino = np.array([
             [[2, 399], [2, 367], [2, 335], [2, 303]],
             [[2, 399], [2, 367], [2, 335], [34, 335]],
@@ -361,58 +362,58 @@ class Tetromino:
             [[-30, 367], [2, 367], [-30, 335], [2, 335]]
         ])
 
-        # Randomly select one tetromino shape
         self.tetromino = self.tetromino[np.random.randint(0, self.tetromino.shape[0])]
-        self.rotate_dir = 1  # Direction for rotation (1 for 90°, -1 for -90°)
 
     def draw(self):
-        """Draw the tetromino on the screen."""
         for i in self.tetromino:
-            box(i[0], i[1])
+            box(i[0],i[1])
 
     def descend(self):
-        """Move the tetromino down by one step."""
         for i in self.tetromino:
-            i[1] -= 32
+            i[1]-=32
 
-    def translate(self, key):
-        """Move the tetromino left or right."""
-        if key.lower() == 'a':  # Move left
-            self.tetromino = [[max((i[0] - 32), -318), i[1]] for i in self.tetromino]
-        elif key.lower() == 'd':  # Move right
-            self.tetromino = [[min((i[0] + 32), 322), i[1]] for i in self.tetromino]
-
+    def translate(self,key):
+        temp = True
+        if key.lower() == 'a':
+            for i in self.tetromino:
+                if i[0] <= -318:
+                    temp = False
+                    break
+            if temp:
+                self.tetromino = [[(i[0]-32),i[1]] for i in self.tetromino]
+        elif key.lower() == 'd':
+            for i in self.tetromino:
+                if i[0] >= 322:
+                    temp = False
+                    break
+            if temp:
+                self.tetromino = [[(i[0]+32),i[1]] for i in self.tetromino]
+        else:
+            # self.tetromino = [[min((i[0]+32),322),i[1]] for i in self.tetromino]
+            pass
+    
     def rotate(self):
-        """Rotate the tetromino 90° or -90° around its center."""
-        # Find the center of the tetromino
-        center = np.mean(self.tetromino, axis=0).astype(int)
+        """Rotate the tetromino continuously by 90° clockwise around its center."""
+        # Ensure tetromino is a NumPy array
+        self.tetromino = np.array(self.tetromino)
 
-        # Rotate each block around the center
-        rotated = []
-        for x, y in self.tetromino:
-            # Translate block to origin (center)
-            translated_x = x - center[0]
-            translated_y = y - center[1]
+        # The center of rotation is the third block of the tetromino
+        center = np.array(self.tetromino[2])
 
-            # Apply rotation based on direction
-            if self.rotate_dir == 1:  # 90° clockwise
-                new_x = translated_y
-                new_y = -translated_x
-            else:  # -90° counterclockwise
-                new_x = -translated_y
-                new_y = translated_x
+        # Define the 90° clockwise rotation matrix
+        rotation_matrix = np.array([[0, -1], [1, 0]])
 
-            # Translate back to original position
-            final_x = new_x + center[0]
-            final_y = new_y + center[1]
+        # Translate tetromino to origin (center), apply rotation, and translate back
+        translated = self.tetromino - center
+        rotated = np.dot(translated, rotation_matrix.T)
+        self.tetromino = (rotated + center).astype(int)
 
-            rotated.append([final_x, final_y])
 
-        # Update the tetromino with the rotated positions
-        self.tetromino = np.array(rotated)
+    def fall(self,x):
+        d = min([(i[1]-x[(i[0]//32)]) for i in self.tetromino ])
+        for i in self.tetromino:
+            i[1] -= d
 
-        # Toggle rotation direction
-        self.rotate_dir *= -1
 
 
 
@@ -441,7 +442,7 @@ class Tetris():
         if self.state == True:
             for i in self.tetro.tetromino:
                 if self.horizon[i[0]//32] < i[1]:
-                    self.horizon[i[0]//32] = i[1]
+                    self.horizon[i[0]//32] = i[1]+32
                     print(self.horizon[i[0]//32])
                 self.matrix[i[1]//32][i[0]//32] = [(i[0]-1//32),(i[1]-1//32)]
 
@@ -510,11 +511,12 @@ def keyboardListener(key, x, y):
         
     if key==b'd':
         game.tetro.translate('d')
-    # if key==b' ':
-    #     draw_laser((x1+x2)/2)
-    elif key == b'f':
+    if key==b'w':
         game.tetro.rotate()
-    pass
+
+    if key==b's':
+        game.tetro.fall(game.horizon)
+    
 
 
     glutPostRedisplay()
@@ -563,10 +565,10 @@ def showScreen():
             #     for j in range(-465,300,32):
             #         box(x_center=i,y_center=j,x=15)
 
-            for i in range(-318,325,32):
-                draw_lines((i,-465),(i,300))
-            for j in range(-465,300,32):
-                draw_lines((-318,j),(325,j))
+            # for i in range(-318,325,32):                # grid
+            #     draw_lines((i,-465),(i,300))
+            # for j in range(-465,300,32):
+            #     draw_lines((-318,j),(325,j))
 
             # tetro.draw()
             # tetro.descend()

@@ -37,9 +37,7 @@ def draw_lines(x,y):
 
         def plot_point(x, y):
             points.append((x, y))
-            # points.append((x, -y))  # Reflect over the x-axis
-            # points.append((-x, y))  # Reflect over the y-axis
-            # points.append((-x, -y)) # Reflect over both axes
+
 
         if dx > dy:
             d = 2 * dy - dx
@@ -446,6 +444,26 @@ class Tetris():
                     print(self.horizon[i[0]//32])
                 self.matrix[i[1]//32][i[0]//32] = [(i[0]-1//32),(i[1]-1//32)]
 
+    def point(self):
+        global point
+        c = 0
+        for i in range(len(self.matrix)):
+            if None in self.matrix[i]:
+                self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+
+                continue
+            else:
+                self.matrix[i] = [None for i in self.matrix[i]]
+                c +=1
+
+                
+        np.roll(self.matrix, shift=c, axis=0)
+        self.horizon = [i-(c*32) for i in self.horizon]
+        point += c*10
+                
+
+                
+
     def play(self):
         if self.state == True:
             self.tetro = Tetromino()
@@ -454,8 +472,10 @@ class Tetris():
         # for i in tetro.tetromino:
         #     if i[1]
         self.tetro.draw()
+        self.point()
         self.check()
         self.tetro.descend()
+        
         self.draw()
 
 
@@ -565,10 +585,10 @@ def showScreen():
             #     for j in range(-465,300,32):
             #         box(x_center=i,y_center=j,x=15)
 
-            # for i in range(-318,325,32):                # grid
-            #     draw_lines((i,-465),(i,300))
-            # for j in range(-465,300,32):
-            #     draw_lines((-318,j),(325,j))
+            for i in range(-318,325,32):                # grid
+                draw_lines((i,-465),(i,300))
+            for j in range(-465,300,32):
+                draw_lines((-318,j),(325,j))
 
             # tetro.draw()
             # tetro.descend()

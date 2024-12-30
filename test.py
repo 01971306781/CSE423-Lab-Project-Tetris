@@ -439,11 +439,15 @@ class Tetris():
                 self.state = True
         if self.state == True:
             for i in self.tetro.tetromino:
-                if self.horizon[i[0]//32] < i[1]:
+                if self.horizon[i[0]//32] <= i[1]:
                     self.horizon[i[0]//32] = i[1]+32
                     print(self.horizon[i[0]//32])
-                self.matrix[i[1]//32][i[0]//32] = [(i[0]-1//32),(i[1]-1//32)]
+                self.matrix[(i[1]+465)//32][(i[0]+318)//32] = [(i[0]-1//32),(i[1]-1//32)]
 
+
+    #todo self.matrix[(i[1]+x)]
+    # the value of matrix is getting updated at that index
+    # the matrix is upside down / need to shift in reverse
     def point(self):
         global score
         c = 0
@@ -455,9 +459,11 @@ class Tetris():
             else:
                 self.matrix[i] = [None for i in self.matrix[i]]
                 c +=1
+                
+                self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
+                self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
                 
-        np.roll(self.matrix, shift=c, axis=0)
         self.horizon = [i-(c*32) for i in self.horizon]
         score += c*10
                 

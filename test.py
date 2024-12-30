@@ -445,9 +445,7 @@ class Tetris():
                 self.matrix[(i[1]+465)//32][(i[0]+318)//32] = [(i[0]-1//32),(i[1]-1//32)]
 
 
-    #todo self.matrix[(i[1]+x)]
-    # the value of matrix is getting updated at that index
-    # the matrix is upside down / need to shift in reverse
+
     def point(self):
         global score
         c = 0

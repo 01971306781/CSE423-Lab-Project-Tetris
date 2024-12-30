@@ -613,7 +613,7 @@ class Tetris():
                             c +=1
                             
                             self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
-                            # self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+                            self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
         # if c > 0:
         #     for i in range(27, -1, -1):
@@ -644,7 +644,7 @@ class Tetris():
             score += 800
         
         if c > 0:
-            desired_fps -= max(1,(score/100) * 5)
+            desired_fps += (score/100) * 5
         
 
     def play(self):

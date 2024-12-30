@@ -345,6 +345,15 @@ def box(x_center=0,y_center=400,x=15):
     draw_circle(x_center,y_center,x)
 
 
+
+def collision(matrix, tetromino):
+    for x, y in tetromino:
+        if matrix[(y+465) // 32][(x +318)// 32] is not None:
+            return True
+    return False
+
+
+
 class Tetromino():
     global score
     global level
@@ -353,7 +362,7 @@ class Tetromino():
             self.tetromino = np.array([
                 [[2, 399], [2, 367], [2, 335], [2, 303]],
                 [[2, 399], [2, 367], [2, 335], [34, 335]],
-                [[-30, 335], [2, 367], [2, 335], [34, 335]]
+                # [[-30, 335], [2, 367], [2, 335], [34, 335]]
 
             ])
         elif score >9 and score<20:
@@ -394,7 +403,7 @@ class Tetromino():
         for i in self.tetromino:
             i[1] -= 32
 
-    def translate(self, key):
+    def translate(self, key,matrix):
         temp = True
         if key.lower() == 'a':
             for i in self.tetromino:
@@ -402,14 +411,22 @@ class Tetromino():
                     temp = False
                     break
             if temp:
-                self.tetromino = [[(i[0] - 32), i[1]] for i in self.tetromino]
+                temp = [[(i[0] - 32), i[1]] for i in self.tetromino]
+                if not collision(matrix, temp):
+                    self.tetromino = [[(i[0] - 32), i[1]] for i in self.tetromino]
+
+
+            
         elif key.lower() == 'd':
             for i in self.tetromino:
                 if i[0] >= 322:
                     temp = False
                     break
             if temp:
-                self.tetromino = [[(i[0] + 32), i[1]] for i in self.tetromino]
+                temp = [[(i[0] + 32), i[1]] for i in self.tetromino]
+                if not collision(game.matrix, temp):
+                    self.tetromino = [[(i[0] + 32), i[1]] for i in self.tetromino]
+
         else:
             # self.tetromino = [[min((i[0]+32),322),i[1]] for i in self.tetromino]
             pass
@@ -455,7 +472,7 @@ class Tetris():
                 box(j[0], j[1])
 
 
-
+    
     def check(self):
         global score
         for i in self.tetro.tetromino:
@@ -500,9 +517,66 @@ class Tetris():
                 self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
                 self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
-                
+                if None in self.matrix[i]:
+                    self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+
+                    continue
+                else:
+                    self.matrix[i] = [None for i in self.matrix[i]]
+                    c +=1
+                    
+                    self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
+                    self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+                    if None in self.matrix[i]:
+                        self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+
+                        continue
+                    else:
+                        self.matrix[i] = [None for i in self.matrix[i]]
+                        c +=1
+                        
+                        self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
+                        self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+                        if None in self.matrix[i]:
+                            self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+
+                            continue
+                        else:
+                            self.matrix[i] = [None for i in self.matrix[i]]
+                            c +=1
+                            
+                            self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
+                            self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+
+        # if c > 0:
+        #     for i in range(27, -1, -1):
+        #         for j in range(21):
+        #             if self.matrix[i][j] is None:
+        #                 continue
+        #             elif i > 0 and self.matrix[i - 1][j] is None:
+        #                 for k in range(i - 1, 23):
+        #                     if k < len(self.matrix) and self.matrix[k][j] is not None:
+        #                         self.matrix[k][j] = (self.matrix[k][j][0], self.matrix[k][j][1] - 32)
+        #                     else:
+        #                         self.matrix[k][j] = None
+        #                 self.horizon[j] -= 32
+
+                            
         self.horizon = [i-(c*32) for i in self.horizon]
-        score += c*10
+        if c == 1:
+            score += 100 
+
+        elif c == 2:
+            score += 300
+        
+        elif c == 3:
+            score += 500
+
+        
+        elif c == 4:
+            score += 800
+            
+        
 
     def play(self):
         if self.state == True:
@@ -563,10 +637,10 @@ def keyboardListener(key, x, y):
     # global x2
     # global score
     if key == b'a' or key == b'A':
-        game.tetro.translate('a')
+        game.tetro.translate('a',game.matrix)
 
     if key == b'd' or key == b'D':
-        game.tetro.translate('d')
+        game.tetro.translate('d',game.matrix)
     if key == b'w' or key == b'W':
         game.tetro.rotate()
 

@@ -14,7 +14,7 @@ score = 0
 misses = 0
 state = True
 paused = False
-desired_fps = 60  # Target FPS
+desired_fps = 75  # Target FPS
 frame_time = 1 / desired_fps  # Time per frame
 previous_time = time.time()
 game_over = False
@@ -202,6 +202,9 @@ def iterate():
 
 def draw_controls():
     global level
+    display_text(-300, 400, f"Your Score: {score}", GLUT_BITMAP_TIMES_ROMAN_24)
+    display_text(200, 400, f"Your Level: {level}", GLUT_BITMAP_TIMES_ROMAN_24)
+
     glColor3f(94 / 255, 119 / 255, 138 / 255)
     y = 480
     x = -300
@@ -232,8 +235,6 @@ def draw_controls():
         level = 6
     elif score>59 and score<70:
         level = 7
-    display_text(-300, 400, f"Your Score: {score}", GLUT_BITMAP_TIMES_ROMAN_24)
-    display_text(200, 400, f"Your Level: {level}", GLUT_BITMAP_TIMES_ROMAN_24)
 
 
 def display_text(x, y, text, font):
@@ -358,14 +359,14 @@ class Tetromino():
     global score
     global level
     def __init__(self):
-        if score>-1 and score<10:
+        if score>-1 and score<100:
             self.tetromino = np.array([
                 [[2, 399], [2, 367], [2, 335], [2, 303]],
                 [[2, 399], [2, 367], [2, 335], [34, 335]],
-                # [[-30, 335], [2, 367], [2, 335], [34, 335]]
+                [[-30, 367], [2, 367], [-30, 335], [2, 335]]
 
             ])
-        elif score >9 and score<20:
+        elif score >99 and score<200:
             level = 2
             self.tetromino = np.array([
                 [[2, 399], [2, 367], [2, 335], [2, 303]],
@@ -373,7 +374,7 @@ class Tetromino():
                 [[-30, 335], [2, 367], [2, 335], [34, 335]],
                 [[-30, 367], [2, 367], [-30, 335], [2, 335]]
             ])
-        elif score >19 and score<30:
+        elif score >199 and score<300:
             level=3
             self.tetromino = np.array([
                 [[2, 399], [2, 367], [2, 335], [2, 303]],
@@ -382,7 +383,7 @@ class Tetromino():
                 [[-30, 367], [2, 367], [-30, 335], [2, 335]],
                 [[2, 335], [34, 335], [34, 367], [66, 367]]
             ])
-        elif score >29:
+        elif score >299:
             level =4
             self.tetromino = np.array([
                 [[2, 399], [2, 367], [2, 335], [2, 303]],
@@ -579,12 +580,15 @@ class Tetris():
         
 
     def play(self):
+        global score, frame_time, desired_fps
+
+        desired_fps -= (score//100) * 5
+        frame_time = 1 / desired_fps
         if self.state == True:
             self.tetro = Tetromino()
             self.state = False
 
-        # for i in tetro.tetromino:
-        #     if i[1]
+
         self.tetro.draw()
         self.point()
         self.check()
@@ -599,8 +603,7 @@ game = Tetris()
 
 tetro = Tetromino()
 
-# for i in tetro.tetromino:
-#     if i[1]
+
 
 
 
@@ -650,7 +653,21 @@ def keyboardListener(key, x, y):
     glutPostRedisplay()
 
 def animate():
-    glutPostRedisplay()
+    global previous_time
+    current_time = time.time()
+    elapsed_time = current_time - previous_time
+
+    if elapsed_time >= frame_time:
+        previous_time = current_time
+
+        # Update game state
+        # ... your game update logic here ...
+
+        # Redraw the screen
+        glutPostRedisplay()
+
+    # Sleep to maintain the desired frame rate
+    time.sleep(max(0, frame_time - elapsed_time))
 
 def showScreen():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -686,11 +703,21 @@ def showScreen():
             game.play()
 
 
-            for i in range(-318,325,32):                # grid
-                draw_lines((i,-465),(i,300))
-            for j in range(-465,300,32):
-                draw_lines((-318,j),(325,j))
-
+            # for i in range(-318,325,32):                # grid
+            #     draw_lines((i,-465),(i,300))
+            # for j in range(-465,300,32):
+            #     draw_lines((-318,j),(325,j))
+            color_f = True
+            for j in range(-465, 300, 32):
+                a = 1
+                for i in range(-318, 325, 32):
+                    if color_f:
+                        color_f = False
+                    else:
+                        color_f = True
+                        a = 0.5
+                    glColor4f(236/255,229/255,221/255, a)
+                    draw_points(i, j,5)
 
 
         draw_controls()

@@ -198,7 +198,54 @@ def iterate():
     glLoadIdentity()
 
 
+    
+def splash(x_center, y_center):
+    
 
+
+    num_splashes = np.random.randint(5, 15)  # Random number of splashes
+    for _ in range(num_splashes):
+        angle = np.random.uniform(0, 2 * np.pi)
+        distance = np.random.uniform(5, 20)
+        x_offset = distance * np.cos(angle)
+        y_offset = distance * np.sin(angle)
+        splash_size = np.random.uniform(1, 3)
+        shade = np.random.uniform(0.8, 1.0)  # Different shades of white
+        glColor3f(shade, shade, shade)
+        draw_points(x_center + x_offset, y_center + y_offset, splash_size)
+    
+
+def splash_screen():
+    """
+    Display the splash screen with the game title and instructions.
+    """
+    glMatrixMode(GL_PROJECTION)
+    glPushMatrix()
+    glLoadIdentity()
+    glOrtho(-320, 320, -240, 240, -1, 1)  # Set orthographic projection for overlay
+    glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
+    glLoadIdentity()
+
+    glColor3f(1, 1, 1)  # Set text color to white
+
+    # Display the game title
+    display_text(-100, 150, "TETRIS", GLUT_BITMAP_TIMES_ROMAN_24)
+    display_text(-200, 100, "PAUSED", GLUT_BITMAP_TIMES_ROMAN_24)
+    display_text(-200, 50, f"Your Score: {score}", GLUT_BITMAP_TIMES_ROMAN_24)
+
+    # Display the game instructions
+    display_text(-200, 0, "Game will present more difficult shapes upon progression", GLUT_BITMAP_TIMES_ROMAN_24)
+    display_text(-200, -50, "Use 'A' and 'D' to move the tetromino", GLUT_BITMAP_TIMES_ROMAN_24)
+    display_text(-200, -100, "Use 'W' to rotate the tetromino", GLUT_BITMAP_TIMES_ROMAN_24)
+    display_text(-200, -150, "Use 'S' to drop the tetromino", GLUT_BITMAP_TIMES_ROMAN_24)
+    draw_controls()
+
+    glMatrixMode(GL_PROJECTION)
+    glPopMatrix()
+    glMatrixMode(GL_MODELVIEW)
+    glPopMatrix()
+    glutSwapBuffers()
 
 def draw_controls():
     global level
@@ -519,12 +566,14 @@ class Tetris():
 
                 continue
             else:
+                for j in self.matrix[i]:
+                    splash(j[0],j[1] )
                 self.matrix[i] = [None for i in self.matrix[i]]
                 c +=1
                 
                 self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
                 # self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
-
+                
                 if None in self.matrix[i]:
                     self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
@@ -585,7 +634,7 @@ class Tetris():
             score += 800
         
         if c > 0:
-            desired_fps -= (score//100) * 5
+            desired_fps -= max(1,(score/100) * 5)
         
 
     def play(self):
@@ -699,8 +748,8 @@ def showScreen():
             glLoadIdentity()
 
             glColor3f(1, 1, 1)  # White text
-            display_text(-50, 0, "PAUSED", GLUT_BITMAP_TIMES_ROMAN_24)
-            display_text(-100, -50, f"Your Score: {score}", GLUT_BITMAP_TIMES_ROMAN_24)
+            splash_screen()
+            
            
 
             glMatrixMode(GL_PROJECTION)

@@ -568,6 +568,7 @@ class Tetris():
             else:
                 for j in self.matrix[i]:
                     splash(j[0],j[1] )
+                time.sleep(0.1)
                 self.matrix[i] = [None for i in self.matrix[i]]
                 c +=1
                 
@@ -579,6 +580,9 @@ class Tetris():
 
                     continue
                 else:
+                    for j in self.matrix[i]:
+                        splash(j[0],j[1] )
+                    time.sleep(0.1)
                     self.matrix[i] = [None for i in self.matrix[i]]
                     c +=1
                     
@@ -589,6 +593,9 @@ class Tetris():
 
                         continue
                     else:
+                        for j in self.matrix[i]:
+                            splash(j[0],j[1] )
+                        time.sleep(0.1)
                         self.matrix[i] = [None for i in self.matrix[i]]
                         c +=1
                         
@@ -599,6 +606,9 @@ class Tetris():
 
                             continue
                         else:
+                            for j in self.matrix[i]:
+                                splash(j[0],j[1] )
+                            time.sleep(0.1)
                             self.matrix[i] = [None for i in self.matrix[i]]
                             c +=1
                             

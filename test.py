@@ -447,7 +447,13 @@ class Tetromino():
         # Translate tetromino to origin (center), apply rotation, and translate back
         translated = self.tetromino - center
         rotated = np.dot(translated, rotation_matrix.T)
-        self.tetromino = (rotated + center).astype(int)
+        temp = (rotated + center).astype(int)
+        for i in temp:
+                if 322 <= i[0] or i[0] <= -318 or i[1] <= -465:
+                    return
+
+        if not collision(game.matrix, temp):
+            self.tetromino = temp
 
 
     def fall(self,x):
@@ -495,6 +501,7 @@ class Tetris():
             
 
     def point(self):
+        global desired_fps
         global score
         global reset
         if reset:
@@ -516,7 +523,7 @@ class Tetris():
                 c +=1
                 
                 self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
-                self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+                # self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
                 if None in self.matrix[i]:
                     self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
@@ -527,7 +534,7 @@ class Tetris():
                     c +=1
                     
                     self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
-                    self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+                    # self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
                     if None in self.matrix[i]:
                         self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
@@ -537,7 +544,7 @@ class Tetris():
                         c +=1
                         
                         self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
-                        self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+                        # self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
                         if None in self.matrix[i]:
                             self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
@@ -547,7 +554,7 @@ class Tetris():
                             c +=1
                             
                             self.matrix[i:] = np.roll(self.matrix[i:], shift=-1, axis=0)
-                            self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
+                            # self.matrix[i] = [[self.matrix[i][j][0],(self.matrix[i][j][1] - (c * 32))] if self.matrix[i][j] is not None else None for j in range(len(self.matrix[i]))]
 
         # if c > 0:
         #     for i in range(27, -1, -1):
@@ -576,13 +583,15 @@ class Tetris():
         
         elif c == 4:
             score += 800
-            
+        
+        if c > 0:
+            desired_fps -= (score//100) * 5
         
 
     def play(self):
         global score, frame_time, desired_fps
 
-        desired_fps -= (score//100) * 5
+        
         frame_time = 1 / desired_fps
         if self.state == True:
             self.tetro = Tetromino()
